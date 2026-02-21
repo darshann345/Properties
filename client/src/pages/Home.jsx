@@ -7,7 +7,7 @@ import PropertiesCard from "../components/PropertiesCard";
 function Home() {
     const [properties, setProperties] = useState([]);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [editingId, setEditingId] = useState(""); // numeric id of property being edited
+    const [editingId, setEditingId] = useState("");
 
     const [formData, setFormData] = useState({
         id: "",
@@ -17,7 +17,7 @@ function Home() {
         contact: ""
     });
 
-    // Fetch properties on mount
+    // Fetch properties on component mount
     useEffect(() => {
         fetchProperties();
     }, []);
@@ -25,19 +25,18 @@ function Home() {
     const fetchProperties = async () => {
         try {
             const res = await getProperties();
-            setProperties(res.data.properties); // backend returns { properties: [...] }
+            setProperties(res.properties);   // ✅ FIXED HERE
         } catch (err) {
             console.error("Error fetching properties:", err);
         }
     };
 
-    // Handle add or update
     const handleSave = async () => {
         try {
             if (isEditMode) {
-                await updateProperty(editingId, formData); // PUT request
+                await updateProperty(editingId, formData);
             } else {
-                await addProperty(formData); // POST request
+                await addProperty(formData);
             }
             clearForm();
             fetchProperties();
@@ -46,14 +45,12 @@ function Home() {
         }
     };
 
-    // Populate form for editing
     const handleEdit = (property) => {
         setIsEditMode(true);
         setEditingId(property.id);
         setFormData({ ...property });
     };
 
-    // Clear form
     const clearForm = () => {
         setIsEditMode(false);
         setEditingId("");
@@ -70,35 +67,58 @@ function Home() {
         <Container maxWidth="md" style={{ marginTop: "20px" }}>
             <h1>Property Management</h1>
 
-            {/* Form */}
+            {/* ID Field */}
+            <TextField
+                label="ID"
+                type="number"
+                value={formData.id}
+                onChange={(e) =>
+                    setFormData({ ...formData, id: Number(e.target.value) })
+                }
+                fullWidth
+                style={{ marginBottom: "10px" }}
+            />
+
+            {/* Title */}
             <TextField
                 label="Title"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                }
                 fullWidth
                 style={{ marginBottom: "10px" }}
             />
 
+            {/* Description */}
             <TextField
                 label="Description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                }
                 fullWidth
                 style={{ marginBottom: "10px" }}
             />
 
+            {/* Image URI */}
             <TextField
                 label="Image URI"
                 value={formData.image_uri}
-                onChange={(e) => setFormData({ ...formData, image_uri: e.target.value })}
+                onChange={(e) =>
+                    setFormData({ ...formData, image_uri: e.target.value })
+                }
                 fullWidth
                 style={{ marginBottom: "10px" }}
             />
 
+            {/* Contact */}
             <TextField
                 label="Contact"
                 value={formData.contact}
-                onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+                onChange={(e) =>
+                    setFormData({ ...formData, contact: e.target.value })
+                }
                 fullWidth
                 style={{ marginBottom: "10px" }}
             />
@@ -115,7 +135,7 @@ function Home() {
                 Clear
             </Button>
 
-            {/* Properties Display */}
+            {/* Property Cards */}
             <PropertiesCard
                 properties={properties}
                 onEdit={handleEdit}
