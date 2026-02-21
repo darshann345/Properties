@@ -2,41 +2,34 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const propertyRouter = require("./Router/Property");
-
-require('dotenv').config(); // Load environment variables
+require("dotenv").config();
 
 const app = express();
-
-// Use environment variable for port (for deployment or local development)
 const PORT = process.env.PORT || 5000;
 
-// 🔥 SIMPLE CORS FIX
-app.use(cors({
-    origin: true,
-    credentials: true
-}));
+// ✅ CORS properly configured
+const corsOptions = {
+    origin: ["http://localhost:3000", "https://properties-alpha-neon.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
-// Parse incoming JSON
+// Parse JSON
 app.use(express.json());
 
-// MongoDB connection string (use environment variables for sensitive data)
-const DB_URL = process.env.DB_URL;
-
-// Connect to MongoDB
+// MongoDB connection
 mongoose
-    .connect(DB_URL)
-    .then(() => {
-        console.log("DB connected");
-    })
+    .connect(process.env.DB_URL)
+    .then(() => console.log("DB connected"))
     .catch((err) => {
         console.error("Error Connecting to DB:", err.message);
         process.exit(1);
     });
 
-// Property routes
+// Routes
 app.use("/Property", propertyRouter);
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
