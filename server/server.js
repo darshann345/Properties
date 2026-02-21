@@ -10,35 +10,21 @@ const app = express();
 // Use environment variable for port (for deployment or local development)
 const PORT = process.env.PORT || 5000;
 
-// CORS configuration to allow requests from both local and production
-const allowedOrigins = [
-    "http://localhost:3000", // React app running locally
-    "https://your-vercel-url.vercel.app", // Your Vercel frontend URL
-    "https://properties-bcw2.onrender.com", // Example backend (for other deployments)
-];
-
-// Enable CORS for the allowed origins
-app.use(
-    cors({
-        origin: function (origin, callback) {
-            if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
-    })
-);
+// 🔥 SIMPLE CORS FIX
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 
 // Parse incoming JSON
 app.use(express.json());
 
 // MongoDB connection string (use environment variables for sensitive data)
-const DB_URL = process.env.DB_URL; // Now using environment variable
+const DB_URL = process.env.DB_URL;
 
 // Connect to MongoDB
 mongoose
-    .connect(DB_URL) // no deprecated options like useNewUrlParser or useUnifiedTopology
+    .connect(DB_URL)
     .then(() => {
         console.log("DB connected");
     })
